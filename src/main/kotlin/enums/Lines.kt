@@ -1,4 +1,4 @@
-package Enums
+package enums
 
 enum class Lines {
     NOLINE, SINGLELINE, DOUBLELINE
