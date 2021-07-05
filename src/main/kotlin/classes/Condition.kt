@@ -20,7 +20,7 @@ class Condition : Item() {
         n10: Int,
         i: Float
     ) {
-        node1 = n1
+        node1 = a
         value_x = b
         value_y = c
         value_z = d

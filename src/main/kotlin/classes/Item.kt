@@ -1,6 +1,6 @@
 package classes
 
-abstract class Item {
+open abstract class Item {
     var id : Int = 0
 
     var x : Float = 0.0f
