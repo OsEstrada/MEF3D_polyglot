@@ -212,8 +212,8 @@ fun createLocalb(el : Int, m: Mesh) : Vector{
     //Llenado de matriz
     for (i in tau.indices){
         mt[i][0] = J*tau[i]
-        mt[9+i][1] = J*tau[i]
-        mt[19+i][2] = J*tau[i]
+        mt[10+i][1] = J*tau[i]
+        mt[20+i][2] = J*tau[i]
     }
 
     var b  = Vector(30, 0f)
@@ -248,7 +248,31 @@ fun createMu(el: Int, m: Mesh) : Matrix{
 }
 
 fun createLocalK(el : Int, m : Mesh) : Matrix{
+    val k = Matrix(30,30,0f)
+    val J = calculateLocalJ(el, m)
+    val mu = createMu(el, m)
+    val EI = m.getParameter(EI.ordinal)
+
+    //Llenado matriz mt
+    for (i in mu.indices){
+        for (j in mu[0].indices){
+            k[i][j] = EI*J*mu[i][j]
+            k[10+i][10+j] = EI*J*mu[i][j]
+            k[20+i][20+j] = EI*J*mu[i][j]
+        }
+    }
+
+    return k
+}
 
 
 
+//Funcion que calcula el resultado del SEL
+fun calculate(K: Matrix?, b: Vector?, T: Vector?) {
+    println("Iniciando calculo de respuesta...")
+    val Kinv = Matrix()
+    println("Calculo de inversa...")
+    inverseMatrix(K!!, Kinv)
+    println("Calculo de respuesta...")
+    productMatrixVector(Kinv, b!!, T!!)
 }
