@@ -2,6 +2,7 @@ package tools
 
 import classes.Mesh
 import classes.Node
+import enums.Parameters.*
 import kotlin.math.pow
 
 fun showKs(Ks: ArrayList<Matrix>) {
@@ -81,7 +82,7 @@ fun calculateLocalJ(ind: Int, m: Mesh): Float {
     return a * e * i + d * h * c + g * b * f - g * e * c - a * h * f - d * b * i
 }
 
-fun calculateLocalA(el: Int, m: Mesh) : Float{
+fun calculateA(el: Int, m: Mesh) : Float{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
@@ -98,7 +99,7 @@ fun calculateLocalA(el: Int, m: Mesh) : Float{
     return -e*a - f*b - g*c + g*d
 }
 
-fun calculateLocalB(el: Int, m: Mesh) : Float{
+fun calculateB(el: Int, m: Mesh) : Float{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
@@ -115,13 +116,13 @@ fun calculateLocalB(el: Int, m: Mesh) : Float{
     return -e*a + f*b + g*c - g*d
 }
 
-fun calculateLocalC(el : Int, m: Mesh) : Float{
+fun calculateC(el : Int, m: Mesh) : Float{
     val c2 = calculatelocalC2(el, m)
 
     return (4f/15f)*c2.pow(2)
 }
 
-fun calculateLocalD(el: Int, m: Mesh) : Float{
+fun calculateD(el: Int, m: Mesh) : Float{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
@@ -144,7 +145,7 @@ fun calculateLocalD(el: Int, m: Mesh) : Float{
     return h*a - i*b + j*c - j*d + k*e - f*l + g*m
 }
 
-fun calculateLocalE(el: Int, m: Mesh) : Float{
+fun calculateE(el: Int, m: Mesh) : Float{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
@@ -152,7 +153,7 @@ fun calculateLocalE(el: Int, m: Mesh) : Float{
     return (8f/3f)*c1.pow(2) + (1f/30f)*c2.pow(2)
 }
 
-fun calculateLocalF(el: Int, m: Mesh) : Float{
+fun calculateF(el: Int, m: Mesh) : Float{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
@@ -160,7 +161,7 @@ fun calculateLocalF(el: Int, m: Mesh) : Float{
     return (2f/3f)*c1*c2 - (1f/30f)*c2.pow(2)
 }
 
-fun calculateLocalG(el: Int, m: Mesh) : Float{
+fun calculateG(el: Int, m: Mesh) : Float{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
@@ -168,18 +169,86 @@ fun calculateLocalG(el: Int, m: Mesh) : Float{
     return -(16f/3f)*c1.pow(2) - (4f/3f)*c1*c2 - (2f/15f)*c2.pow(2)
 }
 
-fun calculateLocalH(el: Int, m: Mesh) : Float{
+fun calculateH(el: Int, m: Mesh) : Float{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return -(16f/3f)*c1.pow(2) - (4f/3f)*c1*c2 - (2f/15f)*c2.pow(2)
+    return (2f/3f)*c1*c2 + (1f/30f)*c2.pow(2)
 }
 
-fun calculateLocalI(el: Int, m: Mesh) : Float{
+fun calculateI(el: Int, m: Mesh) : Float{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
     return -(16f/3f)*c1.pow(2) - (2f/3f)*c2.pow(2)
+}
+
+fun calculateJ(el: Int, m: Mesh) : Float{
+
+    val c2 = calculatelocalC2(el, m)
+
+    return (2f/15f)*c2.pow(2)
+}
+
+fun calculateK(el: Int, m: Mesh) : Float{
+
+    val c1 = calculatelocalC1(el, m)
+    val c2 = calculatelocalC2(el, m)
+
+    return -(4f/3f)*c1*c2
+}
+
+fun createLocalb(el : Int, m: Mesh) : Vector{
+    val tau = floatArrayOf(59f,-1f,-1f,-1f,4f,4f,4f,4f,4f,4f)
+    val mt = Matrix(30,3,0f)
+    val J = calculateLocalJ(el, m)
+    val f = Vector()
+    f.add(m.getParameter(FORCE_X.ordinal))
+    f.add(m.getParameter(FORCE_Y.ordinal))
+    f.add(m.getParameter(FORCE_Z.ordinal))
+
+    //Llenado de matriz
+    for (i in tau.indices){
+        mt[i][0] = J*tau[i]
+        mt[9+i][1] = J*tau[i]
+        mt[19+i][2] = J*tau[i]
+    }
+
+    var b  = Vector(30, 0f)
+    productMatrixVector(mt, f, b)
+
+    return b
+}
+
+fun createMu(el: Int, m: Mesh) : Matrix{
+    val mu = Matrix(10,10,0f)
+    val A = calculateA(el, m)
+    val B = calculateB(el, m)
+    val C = calculateC(el, m)
+    val D = calculateD(el, m)
+    val E = calculateE(el, m)
+    val F = calculateF(el, m)
+    val G = calculateG(el, m)
+    val H = calculateH(el, m)
+    val I = calculateI(el, m)
+    val J = calculateJ(el, m)
+    val K = calculateK(el, m)
+
+    mu[0][0] = A; mu[1][0] = E; mu[4][0] = -F; mu[6][0] = -F; mu[7][0] = G; mu[8][0] = F; mu[9][0] = F //Primera col
+    mu[0][1] = E; mu[1][1] = B; mu[4][1] = -H; mu[6][1] = -H; mu[7][1] = I; mu[8][1] = H; mu[9][1] = H //Segunda col
+    mu[0][4] = -F; mu[1][4] = -H; mu[4][4] = C; mu[6][4] = J; mu[7][4] = -K; mu[8][4] = -C; mu[9][4] = -J //Quinta col
+    mu[0][6] = -F; mu[1][6] = -H; mu[4][6] = J; mu[6][6] = C; mu[7][6] = -K; mu[8][6] = -J; mu[9][6] = -C //Septima col
+    mu[0][7] = G; mu[1][7] = I; mu[4][7] = -K; mu[6][7] = -K; mu[7][7] = D; mu[8][7] = K; mu[9][7] = K //Octava col
+    mu[0][8] = F; mu[1][8] = H; mu[4][8] = -C; mu[6][8] = -J; mu[7][8] = K; mu[8][8] = C; mu[9][8] = J //Novena col
+    mu[0][9] = F; mu[1][9] = H; mu[4][9] = -J; mu[6][9] = -C; mu[7][9] = K; mu[8][9] = J; mu[9][9] = C //Decima col
+
+    return mu
+}
+
+fun createLocalK(el : Int, m : Mesh) : Matrix{
+
+
+
 }
