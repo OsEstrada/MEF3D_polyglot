@@ -1,9 +1,9 @@
 package tools
 
-class Vector () : ArrayList<Float>() {
+class Vector () : ArrayList<Double>() {
 
     //Constructor que servira para inicializar en 0 un vector recien instanciado
-    constructor(size: Int, defaultElement: Float) : this(){
+    constructor(size: Int, defaultElement: Double) : this(){
         for (i in 0 until size) {
             this.add(defaultElement)
         }

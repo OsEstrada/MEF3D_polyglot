@@ -9,9 +9,9 @@ import enums.Sizes.*
 import kotlin.math.pow
 
 
-fun validateZero(n: Float) : Float{
-    if(n < 0.0001f)
-        return 0.0001f
+fun validateZero(n: Double) : Double{
+    if(n < 0.0001)
+        return 0.0001
     return n
 }
 
@@ -32,7 +32,7 @@ fun showbs(bs: ArrayList<Vector>) {
     }
 }
 
-fun calculateLocalVolume(ind: Int, m: Mesh): Float {
+fun calculateLocalVolume(ind: Int, m: Mesh): Double {
 
     //Declaracion de variables a usar
     val el = m.getElement(ind)
@@ -51,26 +51,26 @@ fun calculateLocalVolume(ind: Int, m: Mesh): Float {
     val h = n4.y - n1.y
     val i = n4.z - n1.z
 
-    return (1.0f / 6.0f) * (a * e * i + d * h * c + g * b * f - g * e * c - a * h * f - d * b * i)
+    return (1.0 / 6.0) * (a * e * i + d * h * c + g * b * f - g * e * c - a * h * f - d * b * i)
 }
 
-fun calculatelocalC1(ind: Int, m: Mesh): Float {
+fun calculatelocalC1(ind: Int, m: Mesh): Double {
     val el = m.getElement(ind)
     val n1 = m.getNode(el!!.node1 - 1)
     val n2 = m.getNode(el.node2 - 1)
-    return validateZero((1.0f / validateZero((n2!!.x - n1!!.x).pow(2))))
+    return validateZero((1.0 / validateZero((n2!!.x - n1!!.x).pow(2))))
 }
 
-fun calculatelocalC2(ind: Int, m: Mesh): Float {
+fun calculatelocalC2(ind: Int, m: Mesh): Double {
     val el = m.getElement(ind)
     val n1 = m.getNode(el!!.node1 - 1)
     val n2 = m.getNode(el.node2 - 1)
     val n8 = m.getNode(el.node8 - 1)
 
-    return validateZero((1.0f / validateZero((n2!!.x - n1!!.x))) * (4 * n1.x + 4 * n2.x - 8 * n8!!.x))
+    return validateZero((1.0 / validateZero((n2!!.x - n1!!.x))) * (4 * n1.x + 4 * n2.x - 8 * n8!!.x))
 }
 
-fun calculateLocalJ(ind: Int, m: Mesh): Float {
+fun calculateLocalJ(ind: Int, m: Mesh): Double {
     val el = m.getElement(ind)
 
     val n1: Node? = m.getNode(el!!.node1 - 1)
@@ -89,11 +89,13 @@ fun calculateLocalJ(ind: Int, m: Mesh): Float {
     val i = n4.z - n1.z
 
     println("a: $a b: $b c: $c d: $d e: $e f: $f g: $g h: $h i: $i")
+    println("""Resultado productos:${a*e*i} +  ${d*h*c}  + ${g*b*f} - ${g*e*c} -  ${a*h*f}  -  ${d*b*i}""")
+    println("\n")
     val J = a*e*i+d*h*c+g*b*f-g*e*c-a*h*f-d*b*i
     return J
 }
 
-fun calculateA(el: Int, m: Mesh) : Float{
+fun calculateA(el: Int, m: Mesh) : Double{
 
     val c1 = calculatelocalC1(el, m)
     println("C1: $c1")
@@ -105,14 +107,14 @@ fun calculateA(el: Int, m: Mesh) : Float{
     val c = (4* c1 - c2).pow(5)
     val d = (4* c1 + 3*c2).pow(5)
 
-    val e = 1f/(192*c2.pow(2))
-    val f = 1f/(24*c2)
-    val g = 1f/(3840*c2.pow(3))
+    val e = 1/(192*c2.pow(2))
+    val f = 1/(24*c2)
+    val g = 1/(3840*c2.pow(3))
 
     return validateZero(-e*a - f*b - g*c + g*d)
 }
 
-fun calculateB(el: Int, m: Mesh) : Float{
+fun calculateB(el: Int, m: Mesh) : Double{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
@@ -122,20 +124,20 @@ fun calculateB(el: Int, m: Mesh) : Float{
     val c = (4* c1 + c2).pow(5)
     val d = (4* c1 - 3*c2).pow(5)
 
-    val e = 1f/(192*c2.pow(2))
-    val f = 1f/(24*c2)
-    val g = 1f/(3840*c2.pow(3))
+    val e = 1/(192*c2.pow(2))
+    val f = 1/(24*c2)
+    val g = 1/(3840*c2.pow(3))
 
     return validateZero(-e*a + f*b + g*c - g*d)
 }
 
-fun calculateC(el : Int, m: Mesh) : Float{
+fun calculateC(el : Int, m: Mesh) : Double{
     val c2 = calculatelocalC2(el, m)
 
     return validateZero((4f/15f)*c2.pow(2))
 }
 
-fun calculateD(el: Int, m: Mesh) : Float{
+fun calculateD(el: Int, m: Mesh) : Double{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
@@ -158,64 +160,64 @@ fun calculateD(el: Int, m: Mesh) : Float{
     return validateZero(h*a - i*b + j*c - j*d + k*e - f*l + g*m)
 }
 
-fun calculateE(el: Int, m: Mesh) : Float{
+fun calculateE(el: Int, m: Mesh) : Double{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return validateZero((8f/3f) *c1.pow(2) + (1f/30f)*c2.pow(2))
+    return validateZero((8/3) *c1.pow(2) + (1/30)*c2.pow(2))
 }
 
-fun calculateF(el: Int, m: Mesh) : Float{
+fun calculateF(el: Int, m: Mesh) : Double{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return validateZero((2f/3f) *c1*c2 - (1f/30f)*c2.pow(2))
+    return validateZero((2/3) *c1*c2 - (1/30)*c2.pow(2))
 }
 
-fun calculateG(el: Int, m: Mesh) : Float{
+fun calculateG(el: Int, m: Mesh) : Double{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return validateZero(-(16f/3f)*c1.pow(2) - (4f/3f)*c1*c2 - (2f/15f)*c2.pow(2))
+    return validateZero(-(16/3)*c1.pow(2) - (4/3)*c1*c2 - (2/15)*c2.pow(2))
 }
 
-fun calculateH(el: Int, m: Mesh) : Float{
+fun calculateH(el: Int, m: Mesh) : Double{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return validateZero((2f/3f) *c1*c2 + (1f/30f)*c2.pow(2))
+    return validateZero((2/3) *c1*c2 + (1/30)*c2.pow(2))
 }
 
-fun calculateI(el: Int, m: Mesh) : Float{
+fun calculateI(el: Int, m: Mesh) : Double{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return validateZero(-(16f/3f)*c1.pow(2) - (2f/3f)*c2.pow(2))
+    return validateZero(-(16/3)*c1.pow(2) - (2/3)*c2.pow(2))
 }
 
-fun calculateJ(el: Int, m: Mesh) : Float{
+fun calculateJ(el: Int, m: Mesh) : Double{
 
     val c2 = calculatelocalC2(el, m)
 
-    return validateZero((2f/15f)*c2.pow(2))
+    return validateZero((2/15)*c2.pow(2))
 }
 
-fun calculateK(el: Int, m: Mesh) : Float{
+fun calculateK(el: Int, m: Mesh) : Double{
 
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return validateZero(-(4f/3f)*c1*c2)
+    return validateZero(-(4/3)*c1*c2)
 }
 
 fun createLocalb(el : Int, m: Mesh) : Vector{
-    val tau = floatArrayOf(59f,-1f,-1f,-1f,4f,4f,4f,4f,4f,4f)
-    val mt = Matrix(30,3,0f)
+    val tau = doubleArrayOf(59.0,-1.0,-1.0,-1.0,4.0,4.0,4.0,4.0,4.0,4.0)
+    val mt = Matrix(30,3,0.0)
     val J = calculateLocalJ(el, m)
     val f = Vector()
     f.add(m.getParameter(FORCE_X.ordinal))
@@ -229,14 +231,14 @@ fun createLocalb(el : Int, m: Mesh) : Vector{
         mt[20+i][2] = J*tau[i]
     }
 
-    var b  = Vector(30, 0f)
+    var b  = Vector(30, 0.0)
     productMatrixVector(mt, f, b)
 
     return b
 }
 
 fun createMu(el: Int, m: Mesh) : Matrix{
-    val mu = Matrix(10,10,0f)
+    val mu = Matrix(10,10,0.0)
     val A = calculateA(el, m)
     val B = calculateB(el, m)
     val C = calculateC(el, m)
@@ -261,10 +263,11 @@ fun createMu(el: Int, m: Mesh) : Matrix{
 }
 
 fun createLocalK(el : Int, m : Mesh) : Matrix{
-    val k = Matrix(30,30,0f)
+    val k = Matrix(30,30,0.0)
     val J = calculateLocalJ(el, m)
     val mu = createMu(el, m)
     val EI = m.getParameter(EI.ordinal)
+    println("J ELEMENTO $el :  $J")
 
     //Llenado matriz mt
     for (i in mu.indices){
@@ -445,12 +448,7 @@ fun applyDirichlet(m: Mesh, K: Matrix, b: Vector) {
         for (row in 0 until K.size) {
             val cell = K[row][index]
             K[row].removeAt(index)
-            if(i < n/3)
-                b[row] = b[row] + -1 * c.value_x * cell
-            if(i < (n/3)*2)
-                b[row] = b[row] + -1 * c.value_y * cell
-            if(i <(n/3)*3)
-                b[row] = b[row] + -1 * c.value_z * cell
+            b[row] = b[row] + -1 * c.value_x * cell
         }
     }
 }
@@ -461,7 +459,7 @@ fun calculate(K: Matrix?, b: Vector?, T: Vector?) {
     println("Iniciando calculo de respuesta...")
     val Kinv = Matrix()
     println("Calculo de inversa...")
-    inverseMatrix(K!!, Kinv)
+    inverseMatrixGauss(K!!, Kinv)
     println("Calculo de respuesta...")
     productMatrixVector(Kinv, b!!, T!!)
 }

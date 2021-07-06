@@ -10,21 +10,7 @@ fun main(args: Array<String>) {
     val localbs: ArrayList<Vector> = ArrayList()
     val K = Matrix()
     val b = Vector()
-    val T = Vector()
-
-    //Presentacion al programa
-
-    //Presentacion al programa
-    println("IMPLEMENTACION DEL METODO DE LOS ELEMENTOS FINITOS")
-    println("""	- TRANSFERENCIA DE CALOR
-	- 2 DIMENSIONES"""
-    )
-    println("""	- FUNCIONES DE FORMA LINEALES
-	- PESOS DE GALERKIN"""
-    )
-    println("\t- MALLA TRIANGULAR IRREGULAR")
-    println("*************************************************************************")
-
+    val w = Vector()
 
     //Se instancia el objeto de la clase Mesh
     val m = Mesh()
@@ -35,7 +21,7 @@ fun main(args: Array<String>) {
 
     //Se crean los sitemas locales y se muestran
     crearSistemasLocales(m, localKs, localbs)
-    showKs(localKs); showbs(localbs)
+    //showKs(localKs); showbs(localbs)
     println("*******************************")
 
 
@@ -43,24 +29,21 @@ fun main(args: Array<String>) {
     zeroes(K, m.getSize(NODES.ordinal)*3) //Se multiplica por 3 debido a que son 3 componentes vectoriales alpha beta y gamma
     zeroes(b, m.getSize(NODES.ordinal)*3)
     ensamblaje(m, localKs, localbs, K, b)
-    K.Show()
+    //K.Show()
     println("\n")
     b.Show()
     println("*******************************")
 
     //Se aplica la condicion de Neumann
     applyNeumann(m, b)
-    println("*******************************")
-
 
     //Se aplica la condicion de dirichlet
     applyDirichlet(m, K, b)
-    println("*******************************")
 
     //Se calcula el resultado del SEL
-    zeroes(T, b.size)
-    calculate(K, b, T)
+    zeroes(w, b.size)
+    calculate(K, b, w)
     println("Calculo terminado")
-    T.Show()
+    w.Show()
 }
 

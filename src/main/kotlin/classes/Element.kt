@@ -4,9 +4,9 @@ class Element : Item() {
 
     override fun setValues(
         a: Int,
-        b: Float,
-        c: Float,
-        d: Float,
+        b: Double,
+        c: Double,
+        d: Double,
         n1: Int,
         n2: Int,
         n3: Int,
@@ -17,7 +17,7 @@ class Element : Item() {
         n8: Int,
         n9: Int,
         n10: Int,
-        i: Float
+        i: Double
     ) {
         id = a
         node1 = n1

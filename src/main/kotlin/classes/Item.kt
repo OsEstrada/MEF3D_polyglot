@@ -3,11 +3,11 @@ package classes
 open abstract class Item {
     var id : Int = 0
 
-    var x : Float = 0.0f
+    var x : Double = 0.0
 
-    var y : Float = 0.0f
+    var y : Double = 0.0
 
-    var z : Float = 0.0f
+    var z : Double = 0.0
 
     var node1 : Int = 0
 
@@ -29,13 +29,13 @@ open abstract class Item {
 
     var node10 : Int = 0
 
-    var value_x : Float = 0.0f
+    var value_x : Double = 0.0
 
-    var value_y : Float = 0.0f
+    var value_y : Double = 0.0
 
-    var value_z : Float = 0.0f
+    var value_z : Double = 0.0
 
 
-    abstract fun setValues(a: Int, b: Float, c: Float, d: Float, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int, n6: Int,
-                           n7: Int, n8: Int, n9: Int, n10: Int, i: Float)
+    abstract fun setValues(a: Int, b: Double, c: Double, d: Double, n1: Int, n2: Int, n3: Int, n4: Int, n5: Int, n6: Int,
+                           n7: Int, n8: Int, n9: Int, n10: Int, i: Double)
 }

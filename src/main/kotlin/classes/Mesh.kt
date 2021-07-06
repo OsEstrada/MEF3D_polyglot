@@ -5,7 +5,7 @@ import enums.Sizes
 import enums.Sizes.*
 
 class Mesh {
-    private var parameters = FloatArray(4)
+    private var parameters = DoubleArray(4)
     private var sizes = IntArray(4)
     private lateinit var indices_dirich: IntArray
     private lateinit var node_list: Array<Node?>
@@ -13,7 +13,7 @@ class Mesh {
     private lateinit var dirichlet_list: Array<Condition?>
     private lateinit var neumann_list: Array<Condition?>
 
-    fun setParameters(ei: Float, f_x: Float, f_y: Float, f_z: Float) {
+    fun setParameters(ei: Double, f_x: Double, f_y: Double, f_z: Double) {
         parameters[EI.ordinal] = ei
         parameters[FORCE_X.ordinal] = f_x
         parameters[FORCE_Y.ordinal] = f_y
@@ -31,7 +31,7 @@ class Mesh {
         return sizes[s]
     }
 
-    fun getParameter(p: Int): Float {
+    fun getParameter(p: Int): Double {
         return parameters[p]
     }
 

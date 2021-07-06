@@ -5,9 +5,9 @@ class Condition : Item() {
     //Se reciben 4 datos, el numero del elemento y el valor, si es dirichlet recibira valores, sino recibira solo uno y los otros dos seran 0
     override fun setValues(
         a: Int,
-        b: Float,
-        c: Float,
-        d: Float,
+        b: Double,
+        c: Double,
+        d: Double,
         n1: Int,
         n2: Int,
         n3: Int,
@@ -18,7 +18,7 @@ class Condition : Item() {
         n8: Int,
         n9: Int,
         n10: Int,
-        i: Float
+        i: Double
     ) {
         node1 = a
         value_x = b

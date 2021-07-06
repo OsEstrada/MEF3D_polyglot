@@ -5,35 +5,37 @@ import kotlin.system.exitProcess
 
 //Funciones sobrecargadas que llenan de 0 matrices y vectores respectivamente.
 fun zeroes(M: Matrix, n: Int) {
+    println("Index de zeroes: "+n)
     for (i in 0 until n) {
-        M.add(Vector(n, 0f))
+        M.add(Vector(n, 0.0))
     }
 }
 
 fun zeroes(M: Matrix, n: Int, m: Int) {
     for (i in 0 until n) {
-        M.add(Vector(m, 0f))
+        M.add(Vector(m, 0.0))
     }
 }
 
 fun zeroes(v: Vector, n: Int) {
     for (i in 0 until n) {
-        v.add(0f)
+        v.add(0.0)
     }
 }
 
 //Funcion que copia la informacion de una matriz A a una matriz copy
 fun copyMatrix(A: Matrix, copy: Matrix) {
     zeroes(copy, A.size)
-    for (i in 0 until A.size) {
-        for (j in 0 until A[0].size) {
+    for (i in 0 until A.size -1) {
+        for (j in 0 until A[0].size - 1) {
             copy[i][j] = A[i][j]
+            println("Iteracion: "+j)
         }
     }
 }
 
-fun calculateMember(i: Int, j: Int, r: Int, A: Matrix, B: Matrix): Float {
-    var member = 0f
+fun calculateMember(i: Int, j: Int, r: Int, A: Matrix, B: Matrix): Double {
+    var member = 0.0
     for (k in 0 until r) {
         member += A[i][k] * B[k][j]
     }
@@ -43,7 +45,7 @@ fun calculateMember(i: Int, j: Int, r: Int, A: Matrix, B: Matrix): Float {
 //Metodo estatico que calcula el producto de dos matrices
 fun productMatrixMatrix(A: Matrix, B: Matrix, n: Int, r: Int, m: Int): Matrix? {
     //Instancia la matriz y la llena de ceros
-    var R = Matrix(n, m, 0f)
+    var R = Matrix(n, m, 0.0)
     for (i in 0 until n) {
         for (j in 0 until m) {
             R[i][j] = calculateMember(i, j, r, A, B)
@@ -55,7 +57,7 @@ fun productMatrixMatrix(A: Matrix, B: Matrix, n: Int, r: Int, m: Int): Matrix? {
 //Metodo estatico que calcula el producto de una matriz A por un vector v
 fun productMatrixVector(A: Matrix, v: Vector, R: Vector) {
     for (i in 0 until A.size) {
-        var cell = 0f
+        var cell = 0.0
         for (j in 0 until v.size) {
             cell += A[i][j] * v[j]
         }
@@ -64,7 +66,7 @@ fun productMatrixVector(A: Matrix, v: Vector, R: Vector) {
 }
 
 //Metodo estatico que calcula el producto de un numero real por una matriz
-fun productRealMatrix(real: Float, M: Matrix, R: Matrix) {
+fun productRealMatrix(real: Double, M: Matrix, R: Matrix) {
     zeroes(R, M.size)
     for (i in 0 until M.size) {
         for (j in 0 until M[0].size) {
@@ -82,14 +84,14 @@ fun getMinor(M: Matrix, i: Int, j: Int) {
 }
 
 //Funcion que calcula el determinante de una matriz M
-fun determinant(M: Matrix): Float {
+fun determinant(M: Matrix): Double {
     return if (M.size == 1) M[0][0] else {
-        var det = 0f
+        var det = 0.0
         for (i in 0 until M.get(0).size) {
             var minor = Matrix()
             copyMatrix(M, minor)
             getMinor(minor, 0, i)
-            det += (-1.0f).pow(i) * M[0][i] * determinant(minor)
+            det += (-1.0).pow(i) * M[0][i] * determinant(minor)
         }
         return det
     }
@@ -103,7 +105,7 @@ fun cofactors(M: Matrix, Cof: Matrix) {
             var minor = Matrix()
             copyMatrix(M, minor)
             getMinor(minor, i, j)
-            Cof[i][j] = (-1.0).pow((i + j).toDouble()).toFloat() * determinant(minor)
+            Cof[i][j] = (-1.0).pow((i + j)) * determinant(minor)
         }
     }
 }
@@ -121,15 +123,79 @@ fun transpose(M: Matrix, T: Matrix) {
 //Metodo que calcula la inversa de una matriz M utilizando el metodo de la adjunta.
 fun inverseMatrix(M: Matrix, Minv: Matrix) {
     println("Iniciando Calculo de inversa ....")
-    var Cof = Matrix()
-    var Adj = Matrix()
+    val Cof = Matrix()
+    val Adj = Matrix()
     println("Calculo de determinante...")
-    var det = determinant(M)
-    if (det == 0f) exitProcess(1)
+    val det = determinant(M)
+    if (det == 0.0) exitProcess(1)
     println("Iniciando calculo de cofactores...")
     cofactors(M, Cof)
     println("Calculo de Adjunta...")
     transpose(Cof, Adj)
     println("Calculo de inversa...")
     productRealMatrix(1.0f / det, Adj, Minv)
+}
+
+//ACA SE UBICA EL CODIGO PARA CALCULAR LA INVERSA USANDO GAUSS JORDAN
+
+fun matrizIdentidad(r : Int, c: Int) : Matrix{
+    val M  = Matrix(r,c,0.0)
+    for (i in 0 until M.size){
+        M[i][i] = 1.0
+    }
+
+    return M
+}
+
+fun switchRows(M: Matrix, r1: Int, r2: Int) {
+    var aux: Double
+    println("r1: $r1   r2: $r2")
+    for (i in 0 until M[0].size) {
+        aux = M[r1][i]
+        M[r1][i] = M[r2][i]
+        M[r2][i] = aux
+    }
+}
+
+fun multiplyRowConstant(M: Matrix, r: Int, c: Double) {
+    for (i in 0 until M[0].size) {
+        M[r][i] *= c
+    }
+}
+
+fun addRows(M: Matrix, r1: Int, r2: Int, c: Double) {
+    for (i in 0 until M[0].size) {
+        M[r1][i] += M[r2][i] * c
+    }
+}
+
+fun gaussjordan(M: Matrix): Matrix {
+    println("Size: ${M.size}")
+    val Inv: Matrix = matrizIdentidad(M.size, M[0].size)
+    println("ROWS: ${Inv.size}   COLS: ${Inv[0].size}")
+    for (i in 0 until M.size) {
+        if (M[i][i] == 0.0) {
+            var r = 0
+            while (r < M[0].size-1 && (M[i][r] == 0.0 || M[r][i] == 0.0)) {
+                r++
+            }
+            println("i $i , r $r")
+            switchRows(M, i, r)
+        }
+        var c: Double = 1.0 / M[i][i]
+        multiplyRowConstant(M, i, c)
+        multiplyRowConstant(Inv, i, c)
+        for (j in 0 until M.size) {
+            if (i != j) {
+                c = -M[j][i]
+                addRows(M, j, i, c)
+                addRows(Inv, j, i, c)
+            }
+        }
+    }
+    return Inv
+}
+
+fun inverseMatrixGauss(M: Matrix, Minv: Matrix) {
+   copyMatrix(gaussjordan(M), Minv)
 }
