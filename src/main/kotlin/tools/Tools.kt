@@ -26,8 +26,9 @@ fun obtenerDatos(file: BufferedReader, nlines: Lines, n: Int, itemList: Array<No
         val e: Int = values[0].trim { it <= ' ' }.toInt()
         val r: Float = values[1].trim { it <= ' ' }.toFloat()
         val rr: Float = values[2].trim { it <= ' ' }.toFloat()
+        val rrr: Float = values[2].trim {it <= ' '}.toFloat()
         println("""$e     $r     $rr""")
-        itemList[i]?.setValues(e, r, rr, 0f, 0, 0, 0,0,0,0,0,0,0,0,0f)
+        itemList[i]?.setValues(e, r, rr, rrr, 0, 0, 0,0,0,0,0,0,0,0,0f)
     }
 }
 

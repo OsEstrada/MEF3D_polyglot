@@ -1,6 +1,4 @@
 import classes.Mesh
-import tools.Matrix
-import tools.Vector
 import tools.*
 
 fun main(args: Array<String>) {
@@ -17,12 +15,10 @@ fun main(args: Array<String>) {
 
     //Presentacion al programa
     println("IMPLEMENTACION DEL METODO DE LOS ELEMENTOS FINITOS")
-    println(
-        """	- TRANSFERENCIA DE CALOR
+    println("""	- TRANSFERENCIA DE CALOR
 	- 2 DIMENSIONES"""
     )
-    println(
-        """	- FUNCIONES DE FORMA LINEALES
+    println("""	- FUNCIONES DE FORMA LINEALES
 	- PESOS DE GALERKIN"""
     )
     println("\t- MALLA TRIANGULAR IRREGULAR")
@@ -35,6 +31,11 @@ fun main(args: Array<String>) {
     //Se leen los datos del archivo .dat
     leerMallayCondiciones(m, filename)
     println("Datos obtenidos correctamente\n***********************")
+
+    //Se crean los sitemas locales y se muestran
+    crearSistemasLocales(m, localKs, localbs)
+    showKs(localKs); showbs(localbs)
+    println("*******************************")
 
 }
 

@@ -14,7 +14,7 @@ class Vector () : ArrayList<Float>() {
     fun Show() {
         print("[\t")
         for (i in this.indices) {
-            print(String.format("%.3f", this[i]) + "\t")
+            print(String.format("%.7f", this[i]) + "\t")
         }
         println("]")
     }

@@ -1,9 +1,18 @@
 package tools
 
+import classes.Element
 import classes.Mesh
 import classes.Node
 import enums.Parameters.*
+import enums.Sizes.ELEMENTS
 import kotlin.math.pow
+
+
+fun validateZero(n: Float) : Float{
+    if(n < 0.001f)
+        return 0.001f
+    return n
+}
 
 fun showKs(Ks: ArrayList<Matrix>) {
     for (i in Ks.indices) {
@@ -48,17 +57,16 @@ fun calculatelocalC1(ind: Int, m: Mesh): Float {
     val el = m.getElement(ind)
     val n1 = m.getNode(el!!.node1 - 1)
     val n2 = m.getNode(el.node2 - 1)
-
-    return (1.0f / (n2!!.x - n1!!.x).pow(2))
+    return validateZero((1.0f / validateZero((n2!!.x - n1!!.x).pow(2))))
 }
 
-fun calculatelocalC2(ind: Int, m : Mesh) : Float{
+fun calculatelocalC2(ind: Int, m: Mesh): Float {
     val el = m.getElement(ind)
     val n1 = m.getNode(el!!.node1 - 1)
     val n2 = m.getNode(el.node2 - 1)
     val n8 = m.getNode(el.node8 - 1)
 
-    return (1.0f / (n2!!.x - n1!!.x)) * (4*n1.x + 4*n2.x - 8*n8!!.x)
+    return validateZero((1.0f / validateZero((n2!!.x - n1!!.x))) * (4 * n1.x + 4 * n2.x - 8 * n8!!.x))
 }
 
 fun calculateLocalJ(ind: Int, m: Mesh): Float {
@@ -79,13 +87,17 @@ fun calculateLocalJ(ind: Int, m: Mesh): Float {
     val h = n3.z - n1.z
     val i = n4.z - n1.z
 
-    return a * e * i + d * h * c + g * b * f - g * e * c - a * h * f - d * b * i
+    println("a: $a b: $b c: $c d: $d e: $e f: $f g: $g h: $h i: $i")
+    val J = a*e*i+d*h*c+g*b*f-g*e*c-a*h*f-d*b*i
+    return J
 }
 
 fun calculateA(el: Int, m: Mesh) : Float{
 
     val c1 = calculatelocalC1(el, m)
+    println("C1: $c1")
     val c2 = calculatelocalC2(el, m)
+    println("C2: $c2")
 
     val a = (4* c1 - c2).pow(4)
     val b = (4* c1 - c2).pow(3)
@@ -96,7 +108,7 @@ fun calculateA(el: Int, m: Mesh) : Float{
     val f = 1f/(24*c2)
     val g = 1f/(3840*c2.pow(3))
 
-    return -e*a - f*b - g*c + g*d
+    return validateZero(-e*a - f*b - g*c + g*d)
 }
 
 fun calculateB(el: Int, m: Mesh) : Float{
@@ -113,13 +125,13 @@ fun calculateB(el: Int, m: Mesh) : Float{
     val f = 1f/(24*c2)
     val g = 1f/(3840*c2.pow(3))
 
-    return -e*a + f*b + g*c - g*d
+    return validateZero(-e*a + f*b + g*c - g*d)
 }
 
 fun calculateC(el : Int, m: Mesh) : Float{
     val c2 = calculatelocalC2(el, m)
 
-    return (4f/15f)*c2.pow(2)
+    return validateZero((4f/15f)*c2.pow(2))
 }
 
 fun calculateD(el: Int, m: Mesh) : Float{
@@ -142,7 +154,7 @@ fun calculateD(el: Int, m: Mesh) : Float{
     val l = c1/(96*c2.pow(3))
     val m = (2*c1 - 1)/(192*c2.pow(3))
 
-    return h*a - i*b + j*c - j*d + k*e - f*l + g*m
+    return validateZero(h*a - i*b + j*c - j*d + k*e - f*l + g*m)
 }
 
 fun calculateE(el: Int, m: Mesh) : Float{
@@ -150,7 +162,7 @@ fun calculateE(el: Int, m: Mesh) : Float{
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return (8f/3f)*c1.pow(2) + (1f/30f)*c2.pow(2)
+    return validateZero((8f/3f) *c1.pow(2) + (1f/30f)*c2.pow(2))
 }
 
 fun calculateF(el: Int, m: Mesh) : Float{
@@ -158,7 +170,7 @@ fun calculateF(el: Int, m: Mesh) : Float{
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return (2f/3f)*c1*c2 - (1f/30f)*c2.pow(2)
+    return validateZero((2f/3f) *c1*c2 - (1f/30f)*c2.pow(2))
 }
 
 fun calculateG(el: Int, m: Mesh) : Float{
@@ -166,7 +178,7 @@ fun calculateG(el: Int, m: Mesh) : Float{
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return -(16f/3f)*c1.pow(2) - (4f/3f)*c1*c2 - (2f/15f)*c2.pow(2)
+    return validateZero(-(16f/3f)*c1.pow(2) - (4f/3f)*c1*c2 - (2f/15f)*c2.pow(2))
 }
 
 fun calculateH(el: Int, m: Mesh) : Float{
@@ -174,7 +186,7 @@ fun calculateH(el: Int, m: Mesh) : Float{
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return (2f/3f)*c1*c2 + (1f/30f)*c2.pow(2)
+    return validateZero((2f/3f) *c1*c2 + (1f/30f)*c2.pow(2))
 }
 
 fun calculateI(el: Int, m: Mesh) : Float{
@@ -182,14 +194,14 @@ fun calculateI(el: Int, m: Mesh) : Float{
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return -(16f/3f)*c1.pow(2) - (2f/3f)*c2.pow(2)
+    return validateZero(-(16f/3f)*c1.pow(2) - (2f/3f)*c2.pow(2))
 }
 
 fun calculateJ(el: Int, m: Mesh) : Float{
 
     val c2 = calculatelocalC2(el, m)
 
-    return (2f/15f)*c2.pow(2)
+    return validateZero((2f/15f)*c2.pow(2))
 }
 
 fun calculateK(el: Int, m: Mesh) : Float{
@@ -197,10 +209,11 @@ fun calculateK(el: Int, m: Mesh) : Float{
     val c1 = calculatelocalC1(el, m)
     val c2 = calculatelocalC2(el, m)
 
-    return -(4f/3f)*c1*c2
+    return validateZero(-(4f/3f)*c1*c2)
 }
 
 fun createLocalb(el : Int, m: Mesh) : Vector{
+    println("inciando calculo local b elemento: $el")
     val tau = floatArrayOf(59f,-1f,-1f,-1f,4f,4f,4f,4f,4f,4f)
     val mt = Matrix(30,3,0f)
     val J = calculateLocalJ(el, m)
@@ -208,6 +221,7 @@ fun createLocalb(el : Int, m: Mesh) : Vector{
     f.add(m.getParameter(FORCE_X.ordinal))
     f.add(m.getParameter(FORCE_Y.ordinal))
     f.add(m.getParameter(FORCE_Z.ordinal))
+    println("terminando calculo local b elemento: $el")
 
     //Llenado de matriz
     for (i in tau.indices){
@@ -248,10 +262,14 @@ fun createMu(el: Int, m: Mesh) : Matrix{
 }
 
 fun createLocalK(el : Int, m : Mesh) : Matrix{
+    println("inciando calculo local k elemento: $el")
     val k = Matrix(30,30,0f)
     val J = calculateLocalJ(el, m)
     val mu = createMu(el, m)
     val EI = m.getParameter(EI.ordinal)
+    println("terminando calculo local k elemento: $el")
+
+    println("Elemento: $el  J: $J  EI: $EI")
 
     //Llenado matriz mt
     for (i in mu.indices){
@@ -266,6 +284,100 @@ fun createLocalK(el : Int, m : Mesh) : Matrix{
 }
 
 
+//Esta funcion crea los sitemas locales (K y b) y almacena los datos en sus respectivas listas
+fun crearSistemasLocales(m: Mesh, localKs: ArrayList<Matrix>, localbs: ArrayList<Vector>) {
+    for (i in 0 until m.getSize(ELEMENTS.ordinal)) {
+        localKs.add(createLocalK(i, m))
+        localbs.add(createLocalb(i, m))
+        println("")
+    }
+}
+
+fun assemblyK(e: Element, localK: Matrix, K: Matrix) {
+    val index1 = e.node1 - 1
+    val index2 = e.node2 - 1
+    val index3 = e.node3 - 1
+    val index4 = e.node4 - 1
+    val index5 = e.node5 - 1
+    val index6 = e.node6 - 1
+    val index7 = e.node7 - 1
+    val index8 = e.node8 - 1
+    val index9 = e.node9 - 1
+    val index10 = e.node10 - 1
+
+    _assemblyK(K, localK, index1, 0, e)
+    _assemblyK(K, localK, index2, 1, e)
+    _assemblyK(K, localK, index3, 2, e)
+    _assemblyK(K, localK, index4, 3, e)
+    _assemblyK(K, localK, index5, 4, e)
+    _assemblyK(K, localK, index6, 5, e)
+    _assemblyK(K, localK, index7, 6, e)
+    _assemblyK(K, localK, index8, 7, e)
+    _assemblyK(K, localK, index9, 8, e)
+    _assemblyK(K, localK, index10, 9, e)
+
+}
+
+fun _assemblyK(K: Matrix, localK:Matrix, index: Int, i: Int, e : Element){
+
+    val index1 = e.node1 - 1
+    val index2 = e.node2 - 1
+    val index3 = e.node3 - 1
+    val index4 = e.node4 - 1
+    val index5 = e.node5 - 1
+    val index6 = e.node6 - 1
+    val index7 = e.node7 - 1
+    val index8 = e.node8 - 1
+    val index9 = e.node9 - 1
+    val index10 = e.node10 - 1
+
+    K[index][index1]  += localK[i][0]
+    K[index][index2]  += localK[i][1]
+    K[index][index3]  += localK[i][2]
+    K[index][index4]  += localK[i][3]
+    K[index][index5]  += localK[i][4]
+    K[index][index6]  += localK[i][5]
+    K[index][index7]  += localK[i][6]
+    K[index][index8]  += localK[i][7]
+    K[index][index9]  += localK[i][8]
+    K[index][index10]  += localK[i][9]
+}
+
+fun assemblyb(e: Element, localb: Vector, b: Vector) {
+    val index1 = e.node1 - 1
+    val index2 = e.node2 - 1
+    val index3 = e.node3 - 1
+    val index4 = e.node4 - 1
+    val index5 = e.node5 - 1
+    val index6 = e.node6 - 1
+    val index7 = e.node7 - 1
+    val index8 = e.node8 - 1
+    val index9 = e.node9 - 1
+    val index10 = e.node10 - 1
+
+    b[index1]  += localb[0]
+    b[index2]  += localb[1]
+    b[index3]  += localb[2]
+    b[index4]  += localb[3]
+    b[index5]  += localb[4]
+    b[index6]  += localb[5]
+    b[index7]  += localb[6]
+    b[index8]  += localb[7]
+    b[index9]  += localb[8]
+    b[index10]  += localb[9]
+}
+
+fun ensamblaje(m: Mesh, localKs: ArrayList<Matrix>, localbs: ArrayList<Vector>, K: Matrix, b: Vector) {
+    for (i in 0 until m.getSize(ELEMENTS.ordinal)) {
+        val e = m.getElement(i)
+        if (e != null) {
+            assemblyK(e, localKs[i], K)
+        }
+        if (e != null) {
+            assemblyb(e, localbs[i], b)
+        }
+    }
+}
 
 //Funcion que calcula el resultado del SEL
 fun calculate(K: Matrix?, b: Vector?, T: Vector?) {
