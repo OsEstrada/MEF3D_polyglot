@@ -1,12 +1,13 @@
 import classes.Mesh
+import enums.Sizes.NODES
 import tools.*
 
 fun main(args: Array<String>) {
     //Se guarda el nombre del archivo obtenido de los argumentos pasados al programa
     val filename = args[0]
 
-    val localKs: ArrayList<Matrix> = ArrayList<Matrix>()
-    val localbs: ArrayList<Vector> = ArrayList<Vector>()
+    val localKs: ArrayList<Matrix> = ArrayList()
+    val localbs: ArrayList<Vector> = ArrayList()
     val K = Matrix()
     val b = Vector()
     val T = Vector()
@@ -36,6 +37,25 @@ fun main(args: Array<String>) {
     crearSistemasLocales(m, localKs, localbs)
     showKs(localKs); showbs(localbs)
     println("*******************************")
+
+
+    //Las matrices K y b se llenan de 0 y posteriormente se realiza el ensamblaje
+    zeroes(K, m.getSize(NODES.ordinal))
+    zeroes(b, m.getSize(NODES.ordinal))
+    ensamblaje(m, localKs, localbs, K, b)
+    K.Show()
+    println("\n")
+    b.Show()
+    println("*******************************")
+
+    //Se aplica la condicion de Neumann
+   applyNeumann(m, b)
+   println("*******************************")
+
+
+   //Se aplica la condicion de dirichlet
+   applyDirichlet(m, K, b)
+   println("*******************************")
 
 }
 

@@ -11,7 +11,7 @@ class Matrix() : ArrayList<Vector>(){
     //Funcion que imprime la matriz
     fun Show() {
         for (i in this.indices) {
-            this.get(i).Show()
+            this[i].Show()
         }
     }
 }

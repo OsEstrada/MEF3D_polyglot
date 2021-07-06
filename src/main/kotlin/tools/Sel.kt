@@ -1,16 +1,17 @@
 package tools
 
+import classes.Condition
 import classes.Element
 import classes.Mesh
 import classes.Node
 import enums.Parameters.*
-import enums.Sizes.ELEMENTS
+import enums.Sizes.*
 import kotlin.math.pow
 
 
 fun validateZero(n: Float) : Float{
-    if(n < 0.001f)
-        return 0.001f
+    if(n < 0.0001f)
+        return 0.0001f
     return n
 }
 
@@ -378,6 +379,38 @@ fun ensamblaje(m: Mesh, localKs: ArrayList<Matrix>, localbs: ArrayList<Vector>, 
         }
     }
 }
+
+fun applyNeumann(m: Mesh, b: Vector) {
+    for (i in 0 until m.getSize(NEUMANN.ordinal)) {
+        val c: Condition? = m.getCondition(i, NEUMANN)
+        if (c != null) {
+            b[c.node1- 1] = b[c.node1 - 1] + c.value_x
+        }
+    }
+}
+
+fun applyDirichlet(m: Mesh, K: Matrix, b: Vector) {
+    val n = m.getSize(DIRICHLET.ordinal)
+    println("Tamaño b: ${b.size}")
+    println("Tamaño k: ${K.size}")
+    println("Cantidad nodos dirichlet: $n")
+    for (i in 0 until n/3) {
+        val c = m.getCondition(i, DIRICHLET)
+        val index: Int = c!!.node1
+        K.removeAt(index)
+        b.removeAt(index)
+        for (row in 0 until K.size) {
+            val cell = K[row][index]
+            K[row].removeAt(index)
+
+            b[row] += + -1 * c.value_x * cell
+            b[row] += -1 * c.value_y * cell
+            b[row] += -1 * c.value_z * cell
+
+        }
+    }
+}
+
 
 //Funcion que calcula el resultado del SEL
 fun calculate(K: Matrix?, b: Vector?, T: Vector?) {
