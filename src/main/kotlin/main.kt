@@ -40,8 +40,8 @@ fun main(args: Array<String>) {
 
 
     //Las matrices K y b se llenan de 0 y posteriormente se realiza el ensamblaje
-    zeroes(K, m.getSize(NODES.ordinal))
-    zeroes(b, m.getSize(NODES.ordinal))
+    zeroes(K, m.getSize(NODES.ordinal)*3) //Se multiplica por 3 debido a que son 3 componentes vectoriales alpha beta y gamma
+    zeroes(b, m.getSize(NODES.ordinal)*3)
     ensamblaje(m, localKs, localbs, K, b)
     K.Show()
     println("\n")
@@ -49,13 +49,18 @@ fun main(args: Array<String>) {
     println("*******************************")
 
     //Se aplica la condicion de Neumann
-   applyNeumann(m, b)
-   println("*******************************")
+    applyNeumann(m, b)
+    println("*******************************")
 
 
-   //Se aplica la condicion de dirichlet
-   applyDirichlet(m, K, b)
-   println("*******************************")
+    //Se aplica la condicion de dirichlet
+    applyDirichlet(m, K, b)
+    println("*******************************")
 
+    //Se calcula el resultado del SEL
+    zeroes(T, b.size)
+    calculate(K, b, T)
+    println("Calculo terminado")
+    T.Show()
 }
 

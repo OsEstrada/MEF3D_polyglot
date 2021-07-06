@@ -214,7 +214,6 @@ fun calculateK(el: Int, m: Mesh) : Float{
 }
 
 fun createLocalb(el : Int, m: Mesh) : Vector{
-    println("inciando calculo local b elemento: $el")
     val tau = floatArrayOf(59f,-1f,-1f,-1f,4f,4f,4f,4f,4f,4f)
     val mt = Matrix(30,3,0f)
     val J = calculateLocalJ(el, m)
@@ -222,7 +221,6 @@ fun createLocalb(el : Int, m: Mesh) : Vector{
     f.add(m.getParameter(FORCE_X.ordinal))
     f.add(m.getParameter(FORCE_Y.ordinal))
     f.add(m.getParameter(FORCE_Z.ordinal))
-    println("terminando calculo local b elemento: $el")
 
     //Llenado de matriz
     for (i in tau.indices){
@@ -263,14 +261,10 @@ fun createMu(el: Int, m: Mesh) : Matrix{
 }
 
 fun createLocalK(el : Int, m : Mesh) : Matrix{
-    println("inciando calculo local k elemento: $el")
     val k = Matrix(30,30,0f)
     val J = calculateLocalJ(el, m)
     val mu = createMu(el, m)
     val EI = m.getParameter(EI.ordinal)
-    println("terminando calculo local k elemento: $el")
-
-    println("Elemento: $el  J: $J  EI: $EI")
 
     //Llenado matriz mt
     for (i in mu.indices){
@@ -290,11 +284,10 @@ fun crearSistemasLocales(m: Mesh, localKs: ArrayList<Matrix>, localbs: ArrayList
     for (i in 0 until m.getSize(ELEMENTS.ordinal)) {
         localKs.add(createLocalK(i, m))
         localbs.add(createLocalb(i, m))
-        println("")
     }
 }
 
-fun assemblyK(e: Element, localK: Matrix, K: Matrix) {
+fun assemblyK(e: Element, localK: Matrix, K: Matrix, nnodes: Int) {
     val index1 = e.node1 - 1
     val index2 = e.node2 - 1
     val index3 = e.node3 - 1
@@ -306,20 +299,20 @@ fun assemblyK(e: Element, localK: Matrix, K: Matrix) {
     val index9 = e.node9 - 1
     val index10 = e.node10 - 1
 
-    _assemblyK(K, localK, index1, 0, e)
-    _assemblyK(K, localK, index2, 1, e)
-    _assemblyK(K, localK, index3, 2, e)
-    _assemblyK(K, localK, index4, 3, e)
-    _assemblyK(K, localK, index5, 4, e)
-    _assemblyK(K, localK, index6, 5, e)
-    _assemblyK(K, localK, index7, 6, e)
-    _assemblyK(K, localK, index8, 7, e)
-    _assemblyK(K, localK, index9, 8, e)
-    _assemblyK(K, localK, index10, 9, e)
+    _assemblyK(K, localK, index1, 0, e, nnodes)
+    _assemblyK(K, localK, index2, 1, e, nnodes)
+    _assemblyK(K, localK, index3, 2, e, nnodes)
+    _assemblyK(K, localK, index4, 3, e, nnodes)
+    _assemblyK(K, localK, index5, 4, e, nnodes)
+    _assemblyK(K, localK, index6, 5, e, nnodes)
+    _assemblyK(K, localK, index7, 6, e, nnodes)
+    _assemblyK(K, localK, index8, 7, e, nnodes)
+    _assemblyK(K, localK, index9, 8, e, nnodes)
+    _assemblyK(K, localK, index10, 9, e, nnodes)
 
 }
 
-fun _assemblyK(K: Matrix, localK:Matrix, index: Int, i: Int, e : Element){
+fun _assemblyK(K: Matrix, localK:Matrix, index: Int, i: Int, e : Element, nnodes: Int){
 
     val index1 = e.node1 - 1
     val index2 = e.node2 - 1
@@ -332,6 +325,8 @@ fun _assemblyK(K: Matrix, localK:Matrix, index: Int, i: Int, e : Element){
     val index9 = e.node9 - 1
     val index10 = e.node10 - 1
 
+
+    //Alpha
     K[index][index1]  += localK[i][0]
     K[index][index2]  += localK[i][1]
     K[index][index3]  += localK[i][2]
@@ -342,9 +337,34 @@ fun _assemblyK(K: Matrix, localK:Matrix, index: Int, i: Int, e : Element){
     K[index][index8]  += localK[i][7]
     K[index][index9]  += localK[i][8]
     K[index][index10]  += localK[i][9]
+
+    //beta
+    K[index+nnodes][index1+nnodes]  += localK[i+10][10]
+    K[index+nnodes][index2+nnodes]  += localK[i+10][11]
+    K[index+nnodes][index3+nnodes]  += localK[i+10][12]
+    K[index+nnodes][index4+nnodes]  += localK[i+10][13]
+    K[index+nnodes][index5+nnodes]  += localK[i+10][14]
+    K[index+nnodes][index6+nnodes]  += localK[i+10][15]
+    K[index+nnodes][index7+nnodes]  += localK[i+10][16]
+    K[index+nnodes][index8+nnodes]  += localK[i+10][17]
+    K[index+nnodes][index9+nnodes]  += localK[i+10][18]
+    K[index+nnodes][index10+nnodes]  += localK[i+10][19]
+
+    //gamma
+    K[index+nnodes*2][index1+nnodes*2]  += localK[i+20][20]
+    K[index+nnodes*2][index2+nnodes*2]  += localK[i+20][21]
+    K[index+nnodes*2][index3+nnodes*2]  += localK[i+20][22]
+    K[index+nnodes*2][index4+nnodes*2]  += localK[i+20][23]
+    K[index+nnodes*2][index5+nnodes*2]  += localK[i+20][24]
+    K[index+nnodes*2][index6+nnodes*2]  += localK[i+20][25]
+    K[index+nnodes*2][index7+nnodes*2]  += localK[i+20][26]
+    K[index+nnodes*2][index8+nnodes*2]  += localK[i+20][27]
+    K[index+nnodes*2][index9+nnodes*2]  += localK[i+20][28]
+    K[index+nnodes*2][index10+nnodes*2]  += localK[i+20][29]
+
 }
 
-fun assemblyb(e: Element, localb: Vector, b: Vector) {
+fun assemblyb(e: Element, localb: Vector, b: Vector, nnodes: Int) {
     val index1 = e.node1 - 1
     val index2 = e.node2 - 1
     val index3 = e.node3 - 1
@@ -356,6 +376,7 @@ fun assemblyb(e: Element, localb: Vector, b: Vector) {
     val index9 = e.node9 - 1
     val index10 = e.node10 - 1
 
+    //alpha
     b[index1]  += localb[0]
     b[index2]  += localb[1]
     b[index3]  += localb[2]
@@ -366,16 +387,41 @@ fun assemblyb(e: Element, localb: Vector, b: Vector) {
     b[index8]  += localb[7]
     b[index9]  += localb[8]
     b[index10]  += localb[9]
+
+    //betha
+    b[index1+nnodes]  += localb[10]
+    b[index2+nnodes]  += localb[11]
+    b[index3+nnodes]  += localb[12]
+    b[index4+nnodes]  += localb[13]
+    b[index5+nnodes]  += localb[14]
+    b[index6+nnodes]  += localb[15]
+    b[index7+nnodes]  += localb[16]
+    b[index8+nnodes]  += localb[17]
+    b[index9+nnodes]  += localb[18]
+    b[index10+nnodes]  += localb[19]
+
+    //gamma
+    b[index1+nnodes*2]  += localb[20]
+    b[index2+nnodes*2]  += localb[21]
+    b[index3+nnodes*2]  += localb[22]
+    b[index4+nnodes*2]  += localb[23]
+    b[index5+nnodes*2]  += localb[24]
+    b[index6+nnodes*2]  += localb[25]
+    b[index7+nnodes*2]  += localb[26]
+    b[index8+nnodes*2]  += localb[27]
+    b[index9+nnodes*2]  += localb[28]
+    b[index10+nnodes*2]  += localb[29]
 }
 
 fun ensamblaje(m: Mesh, localKs: ArrayList<Matrix>, localbs: ArrayList<Vector>, K: Matrix, b: Vector) {
     for (i in 0 until m.getSize(ELEMENTS.ordinal)) {
         val e = m.getElement(i)
+        val nnodes = m.getSize(NODES.ordinal)
         if (e != null) {
-            assemblyK(e, localKs[i], K)
+            assemblyK(e, localKs[i], K, nnodes)
         }
         if (e != null) {
-            assemblyb(e, localbs[i], b)
+            assemblyb(e, localbs[i], b, nnodes)
         }
     }
 }
@@ -391,22 +437,20 @@ fun applyNeumann(m: Mesh, b: Vector) {
 
 fun applyDirichlet(m: Mesh, K: Matrix, b: Vector) {
     val n = m.getSize(DIRICHLET.ordinal)
-    println("Tamaño b: ${b.size}")
-    println("Tamaño k: ${K.size}")
-    println("Cantidad nodos dirichlet: $n")
-    for (i in 0 until n/3) {
+    for (i in 0 until m.getSize(DIRICHLET.ordinal)) {
         val c = m.getCondition(i, DIRICHLET)
-        val index: Int = c!!.node1
+        val index: Int = c!!.node1 - 1
         K.removeAt(index)
         b.removeAt(index)
         for (row in 0 until K.size) {
             val cell = K[row][index]
             K[row].removeAt(index)
-
-            b[row] += + -1 * c.value_x * cell
-            b[row] += -1 * c.value_y * cell
-            b[row] += -1 * c.value_z * cell
-
+            if(i < n/3)
+                b[row] = b[row] + -1 * c.value_x * cell
+            if(i < (n/3)*2)
+                b[row] = b[row] + -1 * c.value_y * cell
+            if(i <(n/3)*3)
+                b[row] = b[row] + -1 * c.value_z * cell
         }
     }
 }

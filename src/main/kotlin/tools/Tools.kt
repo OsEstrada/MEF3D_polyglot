@@ -1,12 +1,11 @@
 package tools
 
 import classes.*
-
-import enums.Lines.*
 import enums.Lines
+import enums.Lines.*
+import enums.Modes.*
 import enums.Sizes
 import enums.Sizes.*
-import enums.Modes.*
 import java.io.BufferedReader
 import java.io.FileReader
 import java.io.IOException
@@ -60,8 +59,10 @@ fun obtenerDatos(file: BufferedReader, nlines: Lines, n: Int, itemList: Array<El
 }
 
 @Throws(IOException::class)
-fun obtenerDatos(file: BufferedReader, nlines: Lines, n: Int, itemList: Array<Condition?>, type: Sizes) {
+fun obtenerDatos(file: BufferedReader, nlines: Lines, n: Int, itemList: Array<Condition?>, type: Sizes, nnodes: Int) {
     var line: String
+    var aux = 0
+    var j = 0
     line = file.readLine()
     line = file.readLine()
     var values: Array<String>? = null
@@ -71,10 +72,12 @@ fun obtenerDatos(file: BufferedReader, nlines: Lines, n: Int, itemList: Array<Co
             line = file.readLine()
             line = file.readLine()
             line = file.readLine()
+            j++
+            aux = nnodes*j
         }
         line = file.readLine()
         values = line.split("\\s+".toRegex()).toTypedArray()
-        val e0: Int = values[0].trim { it <= ' ' }.toInt()
+        val e0: Int = values[0].trim { it <= ' ' }.toInt() + aux
         val r0: Float = values[1].trim { it <= ' ' }.toFloat()
         println(e0.toString() + "\t" + r0)
         itemList[i]?.setValues(e0,r0,0f,0f,0,0,0,0,0,0,0,0,0,0,0f)
@@ -127,12 +130,12 @@ fun leerMallayCondiciones(m: Mesh, filename: String) {
                 println("\nElements")
                 obtenerDatos(file, DOUBLELINE, neltos, m.getElements())
                 println("\nDirichlet")
-                obtenerDatos(file, DOUBLELINE, ndirich, m.getDirichlet(), DIRICHLET)
+                obtenerDatos(file, DOUBLELINE, ndirich, m.getDirichlet(), DIRICHLET, nnodes)
                 println("\nNeumann")
-                obtenerDatos(file, DOUBLELINE, nneu, m.getNeumann(), NEUMANN)
+                obtenerDatos(file, DOUBLELINE, nneu, m.getNeumann(), NEUMANN, 0)
 
                 //Se corrigen los indices en base a las filas que seran eliminadas luego de aplicar dirichlet
-                //Tools.Tools.correctConditions(ndirich, m.getDirichlet(), m.getDirichletIndices())
+                correctConditions(ndirich, m.getDirichlet(), m.getDirichletIndices())
             }
         }
     } catch (ex: IOException) {
@@ -144,5 +147,18 @@ fun leerMallayCondiciones(m: Mesh, filename: String) {
                 """.trimIndent()
         )
         exitProcess(1)
+    }
+}
+
+fun correctConditions(n: Int, list: Array<Condition?>, indices: IntArray) {
+    for (i in 0 until n) indices[i] = list[i]!!.node1
+    for (i in 0 until n - 1) {
+        val pivot: Int = list[i]!!.node1
+        //Si la condicion corresponde a un nodo es posterior al pivote, se aplica la correcion al indice
+        for (j in i until n) {
+            if (list[j]!!.node1 > pivot){
+                list[j]!!.node1 = list[j]!!.node1 - 1
+            }
+        }
     }
 }
