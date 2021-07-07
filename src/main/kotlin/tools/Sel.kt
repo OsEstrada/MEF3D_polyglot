@@ -11,7 +11,7 @@ import kotlin.math.pow
 
 fun validateZero(n: Double) : Double{
     if(n < 0.0001)
-        return 0.0001
+        return 0.00001
     return n
 }
 

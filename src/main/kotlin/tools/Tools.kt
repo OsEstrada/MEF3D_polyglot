@@ -169,20 +169,12 @@ fun findIndex(v: Int, s: Int, arr: IntArray): Boolean {
     return false
 }
 
-fun createVectorDirichlet(v: Int, s: Int, arr: IntArray): ArrayList<Int>{
-    val ve = ArrayList<Int>()
-    for (i in 0 until s) {
-        if (arr[i] == v)
-            ve.add(arr[i])
-    }
-    return ve
-}
-
 //Metodo que escribe en un archivo los resultados del SEL
 fun writeResults(m: Mesh, T: Vector, filename: String) {
     val dirichlet_indices = m.getDirichletIndices()
     val nnd = T.size/3
     val dirich = m.getDirichlet()
+    val ndirich = m.getSize(DIRICHLET.ordinal)/3
     val outputfilename: String = addExtension(filename, ".post.res")
     try {
         FileWriter(outputfilename).use { fr ->
@@ -193,16 +185,14 @@ fun writeResults(m: Mesh, T: Vector, filename: String) {
                 var Dpos = 0
                 val n = m.getSize(NODES.ordinal)
                 val nd = m.getSize(DIRICHLET.ordinal)
-                for (i in 0 until n/3) {
+                for (i in 0 until n) {
                     if (findIndex(i + 1, nd, dirichlet_indices)) {
-                        val vec = createVectorDirichlet(i+1, nd, dirichlet_indices);
                         file.write(
-                            """${i + 1} ${dirich[vec[0]]!!.value_x} ${dirich[vec[1]]!!.value_y} ${dirich[vec[2]]!!.value_z}"""
-                        )
+                            "${i + 1} ${dirich[Dpos]!!.x} ${dirich[Dpos+ndirich]!!.x} ${dirich[Dpos+2*ndirich]!!.x}\n"                        )
                         Dpos++
                     } else {
                         file.write(
-                            """${i + 1} ${T[Tpos]} ${T[Tpos+nnd]} ${T[Tpos]+2*nnd}"""
+                            "${i + 1} ${T[Tpos]} ${T[Tpos+nnd]} ${T[Tpos+2*nnd]}\n"
                         )
                         Tpos++
                     }

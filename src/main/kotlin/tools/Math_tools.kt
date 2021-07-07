@@ -193,9 +193,9 @@ fun gaussjordan(M: Matrix): Matrix {
 
 fun inverseMatrixGauss(M: Matrix, Minv: Matrix) {
     println("Calculo de determinante...")
-    val det = determinant(M)
-    if (det == 0.0) exitProcess(1)
-    println("determinante: $det")
+    //val det = determinant(M)
+    //if (det == 0.0) exitProcess(1)
+    //println("determinante: $det")
     println("Calculando inversa...")
     var m = gaussjordan(M)
     m.Show()
