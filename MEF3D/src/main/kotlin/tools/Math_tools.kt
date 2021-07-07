@@ -134,7 +134,8 @@ fun inverseMatrix(M: Matrix, Minv: Matrix) {
     productRealMatrix(1.0f / det, Adj, Minv)
 }
 
-//ACA SE UBICA EL CODIGO PARA CALCULAR LA INVERSA USANDO GAUSS JORDAN
+//ACA SE UBICA EL CODIGO PARA CALCULAR LA INVERSA USANDO GAUSS JORDAN, esto reduce muchisimo el tiempo para calcular la inversa, sin embargo el tiempo de calculo del
+//determinante sigue siendo igual de lento :(
 
 fun matrizIdentidad(r : Int, c: Int) : Matrix{
     val M  = Matrix(r,c,0.0)
@@ -154,7 +155,7 @@ fun switchRows(M: Matrix, r1: Int, r2: Int) {
     }
 }
 
-fun multiplyRowConstant(M: Matrix, r: Int, c: Double) {
+fun RowxConstant(M: Matrix, r: Int, c: Double) {
     for (i in 0 until M[0].size) {
         M[r][i] *= c
     }
@@ -166,7 +167,7 @@ fun addRows(M: Matrix, r1: Int, r2: Int, c: Double) {
     }
 }
 
-fun gaussjordan(M: Matrix): Matrix {
+fun GaussJordan(M: Matrix): Matrix {
     val Inv: Matrix = matrizIdentidad(M.size, M[0].size)
     for (i in 0 until M.size) {
         if (M[i][i] == 0.0) {
@@ -178,8 +179,8 @@ fun gaussjordan(M: Matrix): Matrix {
             switchRows(M, i, r)
         }
         var c: Double = 1.0 / M[i][i]
-        multiplyRowConstant(M, i, c)
-        multiplyRowConstant(Inv, i, c)
+        RowxConstant(M, i, c)
+        RowxConstant(Inv, i, c)
         for (j in 0 until M.size) {
             if (i != j) {
                 c = -M[j][i]
@@ -196,8 +197,6 @@ fun inverseMatrixGauss(M: Matrix, Minv: Matrix) {
     val det = determinant(M)
     if (det == 0.0) exitProcess(1)
     println("Calculando inversa...")
-    var m = gaussjordan(M)
-    m.Show()
-    copyMatrix(gaussjordan(M), Minv)
-
+    var m = GaussJordan(M)
+    copyMatrix(GaussJordan(M), Minv)
 }

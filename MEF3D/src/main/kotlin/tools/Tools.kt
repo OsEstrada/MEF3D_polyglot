@@ -10,6 +10,7 @@ import java.awt.image.DirectColorModel
 import java.io.*
 import kotlin.system.exitProcess
 
+//Polimorfismo no funciono debido a la nulificacion de kotlin, entonces se sobrecargo la funcion 3 veces.
 
 @Throws(IOException::class)
 fun obtenerDatos(file: BufferedReader, nlines: Lines, n: Int, itemList: Array<Node?>) {
@@ -172,7 +173,9 @@ fun findIndex(v: Int, s: Int, arr: IntArray): Boolean {
 //Metodo que escribe en un archivo los resultados del SEL
 fun writeResults(m: Mesh, T: Vector, filename: String) {
     val dirichlet_indices = m.getDirichletIndices()
+    //Numero de nodos, los cuales se sumaran al indice para obtener alpha y betha
     val nnd = T.size/3
+    //numero de condiciones de dirichlet, se sumaran al indice para obtner la componente en y, y la componente en z
     val dirich = m.getDirichlet()
     val ndirich = m.getSize(DIRICHLET.ordinal)/3
     val outputfilename: String = addExtension(filename, ".post.res")

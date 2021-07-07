@@ -33,9 +33,9 @@ class Main{
             zeroes(b, m.getSize(NODES.ordinal)*3)
             ensamblaje(m, localKs, localbs, K, b)
             //K.Show()
-            println("\n")
-            b.Show()
-            println("*******************************")
+            //println("\n")
+            //b.Show()
+            //println("*******************************")
 
             //Se aplica la condicion de Neumann
             applyNeumann(m, b)
@@ -47,9 +47,8 @@ class Main{
             zeroes(w, b.size)
             calculate(K, b, w)
             println("Calculo terminado")
-            w.Show()
+            //w.Show()
 
-            println(w.size.toString() + "\n")
 
             writeResults(m, w, filename)
         }

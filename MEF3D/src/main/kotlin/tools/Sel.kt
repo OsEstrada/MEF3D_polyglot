@@ -8,13 +8,14 @@ import enums.Parameters.*
 import enums.Sizes.*
 import kotlin.math.pow
 
-
+//Debido a GID, surgen muchos ceros, entonces esta funcion sustituye el 0, por un valor chiquito. No es muy pequeño para no obtener numeros extremamente grande al dividir.
 fun validateZero(n: Double) : Double{
     if(n < 0.0001)
         return 0.0001
     return n
 }
 
+//Myestra las Ks
 fun showKs(Ks: ArrayList<Matrix>) {
     for (i in Ks.indices) {
         println("K del elemento" + (i + 1))
@@ -30,28 +31,6 @@ fun showbs(bs: ArrayList<Vector>) {
         bs[i].Show()
         println("**********************************")
     }
-}
-
-fun calculateLocalVolume(ind: Int, m: Mesh): Double {
-
-    //Declaracion de variables a usar
-    val el = m.getElement(ind)
-    val n1: Node? = m.getNode(el!!.node1 - 1)
-    val n2: Node? = m.getNode(el.node2 - 1)
-    val n3: Node? = m.getNode(el.node3 - 1)
-    val n4: Node? = m.getNode(el.node4 - 1)
-
-    val a = n2!!.x - n1!!.x
-    val b = n2.y - n1.y
-    val c = n2.z - n1.z
-    val d = n3!!.x - n1.x
-    val e = n3.y - n1.y
-    val f = n3.z - n1.z
-    val g = n4!!.x - n1.x
-    val h = n4.y - n1.y
-    val i = n4.z - n1.z
-
-    return (1.0 / 6.0) * (a * e * i + d * h * c + g * b * f - g * e * c - a * h * f - d * b * i)
 }
 
 fun calculatelocalC1(ind: Int, m: Mesh): Double {
@@ -88,9 +67,6 @@ fun calculateLocalJ(ind: Int, m: Mesh): Double {
     val h = n3.z - n1.z
     val i = n4.z - n1.z
 
-    println("a: $a b: $b c: $c d: $d e: $e f: $f g: $g h: $h i: $i")
-    println("""Resultado productos:${a*e*i} +  ${d*h*c}  + ${g*b*f} - ${g*e*c} -  ${a*h*f}  -  ${d*b*i}""")
-    println("\n")
     val J = a*e*i+d*h*c+g*b*f-g*e*c-a*h*f-d*b*i
     return validateZero(J)
 }
@@ -98,9 +74,7 @@ fun calculateLocalJ(ind: Int, m: Mesh): Double {
 fun calculateA(el: Int, m: Mesh) : Double{
 
     val c1 = calculatelocalC1(el, m)
-    println("C1: $c1")
     val c2 = calculatelocalC2(el, m)
-    println("C2: $c2")
 
     val a = (4* c1 - c2).pow(4)
     val b = (4* c1 - c2).pow(3)
@@ -267,9 +241,8 @@ fun createLocalK(el : Int, m : Mesh) : Matrix{
     val J = calculateLocalJ(el, m)
     val mu = createMu(el, m)
     val EI = m.getParameter(EI.ordinal)
-    println("J ELEMENTO $el :  $J")
 
-    //Llenado matriz mt
+    //Llenado matriz mt, se sabe que la distancia entre x y y en cada componente es de 10, entonces se suman para usar unicamente una iteracion.
     for (i in mu.indices){
         for (j in mu[0].indices){
             k[i][j] = EI*J*mu[i][j]
