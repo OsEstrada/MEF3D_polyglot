@@ -92,7 +92,7 @@ fun calculateLocalJ(ind: Int, m: Mesh): Double {
     println("""Resultado productos:${a*e*i} +  ${d*h*c}  + ${g*b*f} - ${g*e*c} -  ${a*h*f}  -  ${d*b*i}""")
     println("\n")
     val J = a*e*i+d*h*c+g*b*f-g*e*c-a*h*f-d*b*i
-    return J
+    return validateZero(J)
 }
 
 fun calculateA(el: Int, m: Mesh) : Double{

@@ -5,7 +5,6 @@ import kotlin.system.exitProcess
 
 //Funciones sobrecargadas que llenan de 0 matrices y vectores respectivamente.
 fun zeroes(M: Matrix, n: Int) {
-    println("Index de zeroes: "+n)
     for (i in 0 until n) {
         M.add(Vector(n, 0.0))
     }
@@ -29,7 +28,6 @@ fun copyMatrix(A: Matrix, copy: Matrix) {
     for (i in 0 until A.size -1) {
         for (j in 0 until A[0].size - 1) {
             copy[i][j] = A[i][j]
-            println("Iteracion: "+j)
         }
     }
 }
@@ -149,7 +147,6 @@ fun matrizIdentidad(r : Int, c: Int) : Matrix{
 
 fun switchRows(M: Matrix, r1: Int, r2: Int) {
     var aux: Double
-    println("r1: $r1   r2: $r2")
     for (i in 0 until M[0].size) {
         aux = M[r1][i]
         M[r1][i] = M[r2][i]
@@ -170,9 +167,7 @@ fun addRows(M: Matrix, r1: Int, r2: Int, c: Double) {
 }
 
 fun gaussjordan(M: Matrix): Matrix {
-    println("Size: ${M.size}")
     val Inv: Matrix = matrizIdentidad(M.size, M[0].size)
-    println("ROWS: ${Inv.size}   COLS: ${Inv[0].size}")
     for (i in 0 until M.size) {
         if (M[i][i] == 0.0) {
             var r = 0
@@ -197,5 +192,13 @@ fun gaussjordan(M: Matrix): Matrix {
 }
 
 fun inverseMatrixGauss(M: Matrix, Minv: Matrix) {
-   copyMatrix(gaussjordan(M), Minv)
+    println("Calculo de determinante...")
+    val det = determinant(M)
+    if (det == 0.0) exitProcess(1)
+    println("determinante: $det")
+    println("Calculando inversa...")
+    var m = gaussjordan(M)
+    m.Show()
+    copyMatrix(gaussjordan(M), Minv)
+
 }

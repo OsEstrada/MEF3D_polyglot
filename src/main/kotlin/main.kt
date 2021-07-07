@@ -45,5 +45,23 @@ fun main(args: Array<String>) {
     calculate(K, b, w)
     println("Calculo terminado")
     w.Show()
+
+/*    var M = Matrix(3, 3 ,0.0)
+    M[0][0] = 6.0
+    M[0][1] = 0.0
+    M[0][2] = 2.0
+    M[1][0] = 1.0
+    M[1][1] = 3.0
+    M[1][2] = 7.0
+    M[2][0] = 1.0
+    M[2][1] = 3.0
+    M[2][2] = 0.0
+
+    M.Show()
+
+    val Inv = Matrix()
+
+    inverseMatrixGauss(M, Inv);*/
+
 }
 
